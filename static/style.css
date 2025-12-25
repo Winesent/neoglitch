@@ -1,0 +1,242 @@
+/* Цветовая палитра: тёмный фон + неон */
+:root {
+    --neon-blue: #00f0ff;
+    --neon-purple: #b967ff;
+    --dark-bg: #0a0a14;
+    --card-bg: #111122;
+    --text: #e0e0ff;
+    --border-radius: 10px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--text);
+    padding: 20px;
+    line-height: 1.6;
+}
+
+header h1 {
+    text-align: center;
+    margin: 20px 0 30px;
+    font-size: 2.4rem;
+    color: var(--neon-blue);
+    text-shadow: 0 0 12px var(--neon-blue);
+    letter-spacing: 1px;
+}
+
+/* === Услуги на главной (6+ карточек) === */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 20px 0 30px;
+}
+
+.service-card {
+    background: var(--card-bg);
+    padding: 16px;
+    border: 1px solid var(--neon-purple);
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 8px rgba(185, 103, 255, 0.2);
+    text-align: center;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 12px rgba(185, 103, 255, 0.4);
+}
+
+/* === Форма добавления заявки === */
+form#createForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    margin-bottom: 30px;
+}
+
+form#createForm input,
+form#createForm select,
+form#createForm textarea {
+    padding: 10px;
+    border: 1px solid var(--neon-blue);
+    background: #0c0c1a;
+    color: var(--text);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+form#createForm input[type="text"],
+form#createForm input[type="date"],
+form#createForm select {
+    flex: 1;
+    min-width: 150px;
+}
+
+form#createForm textarea {
+    flex: 2;
+    min-height: 60px;
+    resize: vertical;
+}
+
+form#createForm button {
+    padding: 10px 20px;
+    background: var(--neon-blue);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+form#createForm button:hover {
+    background: #00d0dd;
+}
+
+/* === Список заявок === */
+#requestsList h2 {
+    margin: 20px 0 15px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 6px rgba(0, 240, 255, 0.5);
+}
+
+.request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px;
+    background: var(--card-bg);
+    margin: 12px 0;
+    border: 1px solid #333;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.request-item > div:first-child {
+    flex: 1;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 15px;
+}
+
+.actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.actions button:nth-child(1) {
+    background: var(--neon-purple);
+    color: white;
+}
+
+.actions button:nth-child(2) {
+    background: #ff4d6d;
+    color: white;
+}
+
+/* === Модальное окно редактирования === */
+.edit-form {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.edit-form.active {
+    display: flex;
+}
+
+.edit-form-content {
+    background: var(--card-bg);
+    color: var(--text);
+    padding: 25px;
+    border: 2px solid var(--neon-blue);
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.edit-form-content h3 {
+    margin-bottom: 20px;
+    color: var(--neon-blue);
+    text-align: center;
+}
+
+.edit-form-content input,
+.edit-form-content select,
+.edit-form-content textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    background: #0c0c1a;
+    color: var(--text);
+    border: 1px solid var(--neon-blue);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.edit-form-content button {
+    padding: 10px 16px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.edit-form-content button:nth-child(3) {
+    background: var(--neon-blue);
+    color: #000;
+    width: 100%;
+}
+
+.edit-form-content .close-btn {
+    background: #ff4d6d;
+    color: white;
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    form#createForm {
+        flex-direction: column;
+    }
+
+    .request-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .actions {
+        margin-left: 0;
+        width: 100%;
+    }
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Neoglitch — Импланты Будущего</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Neoglitch — Импланты Будущего</h1>
+    </header>
+
+    <!-- Список доступных услуг (6+) -->
+    <div class="services-grid">
+        <div class="service-card">Нейроинтерфейс CortexLink</div>
+        <div class="service-card">Ретина-имплант VisionX</div>
+        <div class="service-card">Сердечный регулятор CardiCore</div>
+        <div class="service-card">Мышечный усилитель MyoBoost</div>
+        <div class="service-card">Когнитивный чип NeuroChip</div>
+        <div class="service-card">Аудио-имплант SonicEar</div>
+        <div class="service-card">Эпидермальный сканер SkinScan</div>
+    </div>
+
+    <!-- Форма создания заявки -->
+    <form id="createForm">
+        <input type="text" id="client_name" placeholder="Имя клиента" required>
+        <select id="service" required>
+            <option value="">Выберите услугу</option>
+            <option value="Нейроинтерфейс CortexLink">Нейроинтерфейс CortexLink</option>
+            <option value="Ретина-имплант VisionX">Ретина-имплант VisionX</option>
+            <option value="Сердечный регулятор CardiCore">Сердечный регулятор CardiCore</option>
+            <option value="Мышечный усилитель MyoBoost">Мышечный усилитель MyoBoost</option>
+            <option value="Когнитивный чип NeuroChip">Когнитивный чип NeuroChip</option>
+            <option value="Аудио-имплант SonicEar">Аудио-имплант SonicEar</option>
+            <option value="Эпидермальный сканер SkinScan">Эпидермальный сканер SkinScan</option>
+        </select>
+        <input type="date" id="date" required>
+        <textarea id="notes" placeholder="Примечания (необязательно)"></textarea>
+        <button type="submit">Добавить заявку</button>
+    </form>
+
+    <!-- Список заявок -->
+    <div id="requestsList">
+        <h2>Текущие заявки</h2>
+    </div>
+
+    <!-- Модальное окно редактирования -->
+    <div id="editModal" class="edit-form">
+        <div class="edit-form-content">
+            <h3>Редактировать заявку</h3>
+            <input type="hidden" id="editId">
+            <input type="text" id="editClientName" placeholder="Имя клиента" required>
+            <select id="editService" required>
+                <option value="Нейроинтерфейс CortexLink">Нейроинтерфейс CortexLink</option>
+                <option value="Ретина-имплант VisionX">Ретина-имплант VisionX</option>
+                <option value="Сердечный регулятор CardiCore">Сердечный регулятор CardiCore</option>
+                <option value="Мышечный усилитель MyoBoost">Мышечный усилитель MyoBoost</option>
+                <option value="Когнитивный чип NeuroChip">Когнитивный чип NeuroChip</option>
+                <option value="Аудио-имплант SonicEar">Аудио-имплант SonicEar</option>
+                <option value="Эпидермальный сканер SkinScan">Эпидермальный сканер SkinScan</option>
+            </select>
+            <input type="date" id="editDate" required>
+            <textarea id="editNotes" placeholder="Примечания (необязательно)"></textarea>
+            <button type="button" onclick="saveEdit()">Сохранить</button>
+            <button type="button" class="close-btn" onclick="closeEditForm()">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        // Глобальное хранилище заявок
+        let allRequests = [];
+
+        // Установка минимальной даты — завтра
+        function setMinDate() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const minDate = tomorrow.toISOString().split('T')[0];
+            document.getElementById('date').min = minDate;
+            document.getElementById('editDate').min = minDate;
+        }
+
+        // Загрузка заявок с API
+        async function loadRequests() {
+            const res = await fetch('/api/requests');
+            allRequests = await res.json();
+            const container = document.getElementById('requestsList');
+            container.innerHTML = '<h2>Текущие заявки</h2>';
+            if (allRequests.length === 0) {
+                container.innerHTML += '<p>Нет активных заявок</p>';
+                return;
+            }
+            allRequests.forEach(req => {
+                const div = document.createElement('div');
+                div.className = 'request-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${req.client_name}</strong> — ${req.service}<br>
+                        Дата: ${req.date}<br>
+                        ${req.notes ? 'Примечание: ' + req.notes : ''}
+                    </div>
+                    <div class="actions">
+                        <button type="button" onclick="openEdit(${req.id})">Редактировать</button>
+                        <button type="button" onclick="deleteRequest(${req.id})">Удалить</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Создание новой заявки
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                client_name: document.getElementById('client_name').value,
+                service: document.getElementById('service').value,
+                date: document.getElementById('date').value,
+                notes: document.getElementById('notes').value || null
+            };
+            const res = await fetch('/api/requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                e.target.reset();
+                loadRequests();
+            } else {
+                const error = await res.json();
+                alert('Ошибка: ' + (error.detail || 'Не удалось создать заявку'));
+            }
+        });
+
+        // Удаление заявки
+        async function deleteRequest(id) {
+            if (!confirm('Вы уверены, что хотите удалить эту заявку?')) return;
+            const res = await fetch(`/api/requests/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadRequests();
+            } else {
+                alert('Ошибка при удалении заявки');
+            }
+        }
+
+        // Открытие модального окна редактирования
+        function openEdit(id) {
+            const req = allRequests.find(r => r.id === id);
+            if (!req) return;
+            document.getElementById('editId').value = req.id;
+            document.getElementById('editClientName').value = req.client_name;
+            document.getElementById('editService').value = req.service;
+            document.getElementById('editDate').value = req.date;
+            document.getElementById('editNotes').value = req.notes || '';
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Сохранение изменений
+        async function saveEdit() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                client_name: document.getElementById('editClientName').value,
+                service: document.getElementById('editService').value,
+                date: document.getElementById('editDate').value,
+                notes: document.getElementById('editNotes').value || null
+            };
+            const res = await fetch(`/api/requests/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                closeEditForm();
+                loadRequests();
+            } else {
+                const error = await res.json();
+                alert('Ошибка: ' + (error.detail || 'Не удалось сохранить изменения'));
+            }
+        }
+
+        // Закрытие модального окна
+        function closeEditForm() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // Инициализация
+        setMinDate();
+        loadRequests();
+    </script>
+</body>
+</html>
