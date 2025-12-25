@@ -32,11 +32,14 @@
 ---
 
 ## Запуск через Docker
+```bash
 docker build -t neoglitch .
 docker run -d -p 8000:8000 --name neoglitch-app neoglitch
 http://localhost:8000
-
+```
 ## Запуск локальный
-   pip install -r requirements.txt
-   uvicorn main:app --reload
-   http://localhost:8000
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+http://localhost:8000
+```
